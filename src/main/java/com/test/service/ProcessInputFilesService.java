@@ -1,6 +1,7 @@
 package com.test.service;
 
 import com.test.util.PropertiesFactory;
+import com.test.util.PropertiesSingleton;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,19 +24,19 @@ public class ProcessInputFilesService {
     private static String inputDirectory;
     private static int maxOrders;
     private Properties applicationProperties;
+    ProcessDeliveryService processDeliveryService;
 
     public ProcessInputFilesService() throws Exception {
-        try {
-            applicationProperties = PropertiesFactory.getProperties("application.properties");
+
+            applicationProperties = PropertiesSingleton.getApplicationProperties();
             dronsNumber = Integer.valueOf(applicationProperties.getProperty(DRONES_NUMBER));
             inputDirectory = applicationProperties.getProperty(INPUT_DIRECTORY);
             maxOrders = Integer.valueOf(applicationProperties.getProperty(MAX_ORDER));
 
             log.info("application properties got successfully");
-        } catch (IOException e) {
-            log.error("Error loading the system properties file");
-            throw new Exception(e.getMessage());
-        }
+
+            processDeliveryService = new ProcessDeliveryService();
+
     }
 
     public void proccessInputFiles() throws Exception {
@@ -46,8 +47,11 @@ public class ProcessInputFilesService {
         if (availableFileList.size() == 0) {
             throw new Exception("Empty available file list");
         }
+
+        processDeliveryService.processOrders(getFileInformation(availableFileList));
+        //getFileInformationParallel(availableFileList);
         //getFileInformation(availableFileList);
-        getFileInformationParallel(availableFileList);
+
     }
 
     public List<String> getAvailableFiles() {
@@ -56,7 +60,7 @@ public class ProcessInputFilesService {
         return Arrays.asList(contents);
     }
 
-    public void getFileInformation(List<String> inputFileList) {
+    public Map<Integer, List<String>> getFileInformation(List<String> inputFileList) {
         Map<Integer, List<String>> ordersByDrone = new HashMap<Integer, List<String>>();
         long start = System.currentTimeMillis();
         inputFileList.stream().forEach(fileName -> {
@@ -83,9 +87,10 @@ public class ProcessInputFilesService {
         long result = end - start;
         log.info("result: " + result);
         log.info(ordersByDrone.toString());
+        return ordersByDrone;
     }
 
-    public void getFileInformationParallel(List<String> inputFileList) {
+    public Map<Integer, List<String>> getFileInformationParallel(List<String> inputFileList) {
         Map<Integer, List<String>> ordersByDrone = new HashMap<Integer, List<String>>();
         long start = System.currentTimeMillis();
         inputFileList.stream().parallel().forEach(fileName -> {
@@ -112,6 +117,7 @@ public class ProcessInputFilesService {
         long result = end - start;
         log.info("result: " + result);
         log.info(ordersByDrone.toString());
+        return ordersByDrone;
     }
 
 }
