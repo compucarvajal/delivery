@@ -20,7 +20,7 @@ public class ProcessDeliveryService {
     public ProcessDeliveryService() throws Exception {
         Properties applicationProperties = PropertiesSingleton.getApplicationProperties();
         xIni = Integer.parseInt(applicationProperties.getProperty("initial.x"));
-        yIni = Integer.valueOf(applicationProperties.getProperty("initial.y"));
+        yIni = Integer.parseInt(applicationProperties.getProperty("initial.y"));
         maxLimit = Integer.parseInt(applicationProperties.getProperty("max.limit"));
         log.info("application properties got successfully");
         performDeliveryService = new PerformDeliveryService();
@@ -82,28 +82,8 @@ public class ProcessDeliveryService {
         return validate;
     }
 
-    /*
-    public void move(char command, Drone drone) {
-        switch (command) {
-            case 'A':
-                //log.info("ahead moving");
-                drone.moveA();
-                break;
-            case 'I':
-                drone.moveLeft();
-                break;
-            case 'D':
-                //log.info("right moving");
-                drone.moveRigth();
-                break;
-        }
-    }*/
-
     public Boolean validateCommand(char command) {
-        //log.info("command " + command);
-        //log.info("contain " + contain);
         return Arrays.asList('A', 'I', 'D').contains(command);
     }
-
 
 }

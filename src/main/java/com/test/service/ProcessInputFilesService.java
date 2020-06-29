@@ -1,8 +1,6 @@
 package com.test.service;
 
-import com.test.util.PropertiesFactory;
 import com.test.util.PropertiesSingleton;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +21,6 @@ public class ProcessInputFilesService {
     private static int dronesNumber;
     private static String inputDirectory;
     private static int maxOrders;
-    private Properties applicationProperties;
 
     private static int cont=0;
 
@@ -31,10 +28,10 @@ public class ProcessInputFilesService {
 
     public ProcessInputFilesService() throws Exception {
 
-        applicationProperties = PropertiesSingleton.getApplicationProperties();
-        dronesNumber = Integer.valueOf(applicationProperties.getProperty(DRONES_NUMBER));
+        Properties applicationProperties = PropertiesSingleton.getApplicationProperties();
+        dronesNumber = Integer.parseInt(applicationProperties.getProperty(DRONES_NUMBER));
         inputDirectory = applicationProperties.getProperty(INPUT_DIRECTORY);
-        maxOrders = Integer.valueOf(applicationProperties.getProperty(MAX_ORDER));
+        maxOrders = Integer.parseInt(applicationProperties.getProperty(MAX_ORDER));
 
 
         log.info("application properties got successfully");
@@ -53,14 +50,13 @@ public class ProcessInputFilesService {
         }
 
         processDeliveryService.processOrders(getFileInformation(availableFileList));
-        //getFileInformationParallel(availableFileList);
-        //getFileInformation(availableFileList);
 
     }
 
     public List<String> getAvailableFiles() {
         File directoryPath = new File(inputDirectory);
-        String contents[] = directoryPath.list();
+        String[] contents = directoryPath.list();
+        assert contents != null;
         return Arrays.asList(contents);
     }
 
@@ -72,7 +68,7 @@ public class ProcessInputFilesService {
             try {
                 log.info("path: " + inputDirectory + fileName);
                 String content = Files.readString(Paths.get(inputDirectory + fileName));
-                int drone = Integer.valueOf(fileName.substring(2, 4));
+                int drone = Integer.parseInt(fileName.substring(2, 4));
                 log.info(String.valueOf(drone));
                 log.info(content);
                 List<String> lines = Arrays.asList(content.split(System.getProperty("line.separator")));
@@ -88,36 +84,6 @@ public class ProcessInputFilesService {
                 }
             } catch (IOException e) {
                 log.error("reading file error");
-            }
-        });
-        long end = System.currentTimeMillis();
-        long result = end - start;
-        log.info("result: " + result);
-        log.info(ordersByDrone.toString());
-        return ordersByDrone;
-    }
-
-    public Map<Integer, List<String>> getFileInformationParallel(List<String> inputFileList) {
-        Map<Integer, List<String>> ordersByDrone = new HashMap<Integer, List<String>>();
-        long start = System.currentTimeMillis();
-        inputFileList.stream().parallel().forEach(fileName -> {
-            log.info(fileName);
-            try {
-                log.info("path: " + inputDirectory + fileName);
-                String content = Files.readString(Paths.get(inputDirectory + fileName));
-                int drone = Integer.valueOf(fileName.substring(2, 4));
-                log.info(String.valueOf(drone));
-                log.info(content);
-                List<String> lines = Arrays.asList(content.split(System.getProperty("line.separator")));
-                log.info("lines, size: " + lines.size());
-                if (maxOrders <= lines.size()) {
-                    lines = lines.subList(0, maxOrders);
-                } else {
-                    lines = lines.subList(0, lines.size());
-                }
-                ordersByDrone.put(drone, lines);
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         });
         long end = System.currentTimeMillis();
