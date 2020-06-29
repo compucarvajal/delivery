@@ -2,6 +2,7 @@ package com.test.domain;
 
 import com.test.service.ProcessDeliveryService;
 import com.test.util.PropertiesSingleton;
+import lombok.Data;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+@Data
 public class Drone implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(Drone.class.getName());
@@ -89,20 +91,8 @@ public class Drone implements Runnable {
         }
     }
 
-    public Location getLocation() {
-        return location;
-    }
-
     public void addOrderAdress(String orderAddress) {
         orderAddresses.add(orderAddress);
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setOrientation(CardinalPoint c) {
-        this.orientation = c;
     }
 
     @Override
@@ -134,7 +124,7 @@ public class Drone implements Runnable {
                         move(c);
                     }
                     outputText.append(System.getProperty("line.separator"));
-                    outputText.append(getLocation().getLocationLikePoint() + " dirección " + orientation.toString());
+                    outputText.append(getLocation().getLocationLikePoint() + " dirección " + translateOrientation(orientation));
                 }
         );
         log.info(outputText.toString());
@@ -156,30 +146,25 @@ public class Drone implements Runnable {
         }
     }
 
-    @SneakyThrows
-    public void runTest() {
-        log.info("begin run");
-        Properties properties = PropertiesSingleton.getApplicationProperties();
-        String outputPath = properties.getProperty("output.files.path");
-        String fileName = "out" + StringUtils.leftPad(String.valueOf(id), 2, "0") + ".txt";
-        String fullOutputPath = outputPath + fileName;
-
-        String header = "== Reporte de entregas ==";
-        StringBuilder outputText = new StringBuilder();
-        outputText.append(header);
-        log.info(getLocation().toString());
-        log.info(orientation.toString());
-        orderAddresses.stream().forEach(order -> {
-                    log.info(order);
-                    for (char c : order.toCharArray()) {
-                        move(c);
-                    }
-                    outputText.append("/n");
-                    outputText.append(getLocation().getLocationLikePoint() + " dirección " + CardinalPoint.SOUTH.toString());
-                }
-        );
-        log.info(getLocation().toString());
-        log.info(outputText.toString());
-        log.info("run finished");
+    private String translateOrientation(CardinalPoint cardinalPoint) {
+        String value;
+        switch (cardinalPoint) {
+            case SOUTH:
+                value = "Sur";
+                break;
+            case NORTH:
+                value = "Norte";
+                break;
+            case WEST:
+                value = "Occidente";
+                break;
+            case EAST:
+                value = "Oriente";
+                break;
+            default:
+                value = "";
+                break;
+        }
+        return value;
     }
 }
