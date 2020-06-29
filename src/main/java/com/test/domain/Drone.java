@@ -117,7 +117,7 @@ public class Drone implements Runnable {
     @SneakyThrows
     @Override
     public void run() {
-        System.out.println("begin run");
+        log.info("begin run");
         Properties properties = PropertiesSingleton.getApplicationProperties();
         String outputPath = properties.getProperty("output.files.path");
         String fileName = "out" + StringUtils.leftPad(String.valueOf(id), 2, "0") + ".txt";
@@ -127,9 +127,9 @@ public class Drone implements Runnable {
         String header = "== Reporte de entregas ==";
         StringBuilder outputText = new StringBuilder();
         outputText.append(header);
-        System.out.println(getLocation());
+        log.info(getLocation().toString());
         orderAddresses.stream().forEach(order -> {
-                    System.out.println(order);
+                    log.info(order);
                     for (char c : order.toCharArray()) {
                         move(c);
                     }
@@ -137,9 +137,9 @@ public class Drone implements Runnable {
                     outputText.append(getLocation().getLocationLikePoint() + " dirección " + orientation.toString());
                 }
         );
-        System.out.println(outputText.toString());
+        log.info(outputText.toString());
         Files.writeString(filePath, outputText.toString());
-        System.out.println("run finished");
+        log.info("run finished");
     }
 
     public void move(char command) {
@@ -158,7 +158,7 @@ public class Drone implements Runnable {
 
     @SneakyThrows
     public void runTest() {
-        System.out.println("begin run");
+        log.info("begin run");
         Properties properties = PropertiesSingleton.getApplicationProperties();
         String outputPath = properties.getProperty("output.files.path");
         String fileName = "out" + StringUtils.leftPad(String.valueOf(id), 2, "0") + ".txt";
@@ -167,10 +167,10 @@ public class Drone implements Runnable {
         String header = "== Reporte de entregas ==";
         StringBuilder outputText = new StringBuilder();
         outputText.append(header);
-        System.out.println(getLocation());
-        System.out.println(orientation.toString());
+        log.info(getLocation().toString());
+        log.info(orientation.toString());
         orderAddresses.stream().forEach(order -> {
-                    System.out.println(order);
+                    log.info(order);
                     for (char c : order.toCharArray()) {
                         move(c);
                     }
@@ -178,8 +178,8 @@ public class Drone implements Runnable {
                     outputText.append(getLocation().getLocationLikePoint() + " dirección " + CardinalPoint.SOUTH.toString());
                 }
         );
-        System.out.println(getLocation());
-        System.out.println(outputText.toString());
-        System.out.println("run finished");
+        log.info(getLocation().toString());
+        log.info(outputText.toString());
+        log.info("run finished");
     }
 }

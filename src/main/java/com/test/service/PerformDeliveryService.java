@@ -9,7 +9,6 @@ public class PerformDeliveryService {
 
 
     public void performDelivery(List<Drone> drones){
-        System.out.println("entro perfom");
         drones.forEach(drone->{
             new Thread(drone).start();
         } );
