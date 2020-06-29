@@ -46,7 +46,7 @@ public class ProcessInputFilesService {
             log.info(fileName);
         }
         if (availableFileList.size() == 0) {
-            throw new Exception("Empty available file list");
+            throw new Exception("available file list is empty");
         }
 
         processDeliveryService.processOrders(getFileInformation(availableFileList));
