@@ -1,7 +1,6 @@
 package com.test.service;
 
 import org.junit.Test;
-import org.mockito.Mock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
