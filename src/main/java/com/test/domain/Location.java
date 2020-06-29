@@ -36,23 +36,13 @@ public class Location {
                 '}';
     }
 
-    public int getX() {
-        return x;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
 
     public String getLocationLikePoint() {
         return "(" + x + "," + y + ')';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return x == ((Location)obj).getX() && y == ((Location)obj).getY();
     }
 }
