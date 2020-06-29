@@ -8,12 +8,19 @@ import java.util.Properties;
 public class PropertiesFactory {
 
     public static Properties getProperties(String propertieName) throws IOException {
-        String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
-        String appPropertiesPath = rootPath + propertieName;
-        Properties appProps = new Properties();
-        appProps.load(new FileInputStream(appPropertiesPath));
+        Properties appProps;
+        switch (propertieName){
+            case "application.properties":
+                String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+                String appPropertiesPath = rootPath + propertieName;
+                appProps = new Properties();
+                appProps.load(new FileInputStream(appPropertiesPath));
+                break;
+            default:
+                appProps= null;
+                break;
+        }
+
         return appProps;
     }
-
-
 }
