@@ -17,25 +17,29 @@ public class ProcessInputFilesService {
 
     private static final Logger log = LoggerFactory.getLogger(ProcessInputFilesService.class.getName());
     private static final String INPUT_DIRECTORY = "input.files.path";
-    private static final String DRONES_NUMBER = "drones.number";
+    private static final String DRONES_NUMBER = "max.drones.number";
     private static final String MAX_ORDER = "max.orders";
 
-    private static int dronsNumber;
+    private static int dronesNumber;
     private static String inputDirectory;
     private static int maxOrders;
     private Properties applicationProperties;
+
+    private static int cont=0;
+
     ProcessDeliveryService processDeliveryService;
 
     public ProcessInputFilesService() throws Exception {
 
-            applicationProperties = PropertiesSingleton.getApplicationProperties();
-            dronsNumber = Integer.valueOf(applicationProperties.getProperty(DRONES_NUMBER));
-            inputDirectory = applicationProperties.getProperty(INPUT_DIRECTORY);
-            maxOrders = Integer.valueOf(applicationProperties.getProperty(MAX_ORDER));
+        applicationProperties = PropertiesSingleton.getApplicationProperties();
+        dronesNumber = Integer.valueOf(applicationProperties.getProperty(DRONES_NUMBER));
+        inputDirectory = applicationProperties.getProperty(INPUT_DIRECTORY);
+        maxOrders = Integer.valueOf(applicationProperties.getProperty(MAX_ORDER));
 
-            log.info("application properties got successfully");
 
-            processDeliveryService = new ProcessDeliveryService();
+        log.info("application properties got successfully");
+
+        processDeliveryService = new ProcessDeliveryService();
 
     }
 
@@ -72,15 +76,18 @@ public class ProcessInputFilesService {
                 log.info(String.valueOf(drone));
                 log.info(content);
                 List<String> lines = Arrays.asList(content.split(System.getProperty("line.separator")));
-                if(maxOrders<=lines.size()) {
+                if (maxOrders <= lines.size()) {
                     lines = lines.subList(0, maxOrders);
-                }else{
+                } else {
                     lines = lines.subList(0, lines.size());
                 }
                 log.info("lines, size: " + lines.size());
-                ordersByDrone.put(drone, lines);
+                if(cont<dronesNumber){
+                    ordersByDrone.put(drone, lines);
+                    cont++;
+                }
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("reading file error");
             }
         });
         long end = System.currentTimeMillis();
@@ -103,9 +110,9 @@ public class ProcessInputFilesService {
                 log.info(content);
                 List<String> lines = Arrays.asList(content.split(System.getProperty("line.separator")));
                 log.info("lines, size: " + lines.size());
-                if(maxOrders<=lines.size()) {
+                if (maxOrders <= lines.size()) {
                     lines = lines.subList(0, maxOrders);
-                }else{
+                } else {
                     lines = lines.subList(0, lines.size());
                 }
                 ordersByDrone.put(drone, lines);
